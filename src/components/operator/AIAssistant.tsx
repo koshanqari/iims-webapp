@@ -1,12 +1,65 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Sparkles, Loader2, CheckCircle, AlertCircle, Wrench, Package } from "lucide-react";
+
+// Extend Window interface for Speech Recognition
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+}
+
+interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionAlternative;
+  isFinal: boolean;
+  length: number;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}
+
+interface ISpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+declare global {
+  interface Window {
+    webkitSpeechRecognition?: new () => ISpeechRecognition;
+    SpeechRecognition?: new () => ISpeechRecognition;
+  }
+}
+import { 
+  Send, 
+  Sparkles, 
+  Loader2, 
+  CheckCircle, 
+  AlertCircle, 
+  Wrench, 
+  Package,
+  Mic,
+  MicOff,
+  Camera,
+  Image as ImageIcon,
+  X
+} from "lucide-react";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  image?: string;
   functionCalls?: { name: string; result: string }[];
 }
 
@@ -22,12 +75,18 @@ export default function AIAssistant() {
     {
       id: "1",
       role: "assistant",
-      content: "Hello! I'm UELMS AI, your equipment assistant. I can help you with:\n\n• Maintenance schedules and equipment status\n• Troubleshooting and fault codes\n• Creating service requests\n• Ordering replacement parts\n\nHow can I help you today?",
+      content: "Hello, Rajesh! I'm UELMS AI, your equipment assistant. I can help you with:\n\n• Maintenance schedules and equipment status\n• Troubleshooting and fault codes\n• Creating service requests\n• Ordering replacement parts\n\nYou can type, use voice input, or share images of equipment issues. How can I help you today?",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,22 +97,27 @@ export default function AIAssistant() {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !selectedImage) || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input,
+      content: input || (selectedImage ? "📷 [Image attached]" : ""),
+      image: selectedImage || undefined,
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
+    const currentImage = selectedImage;
     setInput("");
+    setSelectedImage(null);
+    setImageFile(null);
     setIsLoading(true);
 
     try {
       // Build conversation history for API
       const conversationHistory = messages
-        .filter((m) => m.id !== "1") // Exclude initial greeting
+        .filter((m) => m.id !== "1")
         .map((m) => ({
           role: m.role,
           content: m.content,
@@ -61,7 +125,7 @@ export default function AIAssistant() {
 
       conversationHistory.push({
         role: "user",
-        content: input,
+        content: currentInput || "Please analyze this image and help me with any equipment issues you can identify.",
       });
 
       const response = await fetch("/api/chat", {
@@ -69,7 +133,10 @@ export default function AIAssistant() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ messages: conversationHistory }),
+        body: JSON.stringify({ 
+          messages: conversationHistory,
+          image: currentImage,
+        }),
       });
 
       const data = await response.json();
@@ -101,6 +168,96 @@ export default function AIAssistant() {
 
   const handleSuggestedQuestion = (question: string) => {
     setInput(question);
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImageFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        stream.getTracks().forEach(track => track.stop());
+        
+        // Convert audio to text using Web Speech API or send to backend
+        // For now, we'll use the Web Speech API for real-time transcription
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+
+      // Use Web Speech API for real-time transcription
+      const SpeechRecognitionConstructor = window.webkitSpeechRecognition || window.SpeechRecognition;
+      
+      if (SpeechRecognitionConstructor) {
+        const recognition = new SpeechRecognitionConstructor();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          setInput((prev) => prev + transcript);
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error:', event);
+        };
+
+        recognition.onend = () => {
+          setIsRecording(false);
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            mediaRecorderRef.current.stop();
+          }
+        };
+
+        recognition.start();
+      }
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      alert("Could not access microphone. Please check permissions.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    setIsRecording(false);
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
   };
 
   const renderFunctionCallBadge = (functionCall: { name: string; result: string }) => {
@@ -164,6 +321,18 @@ export default function AIAssistant() {
                   <span className="text-xs font-medium text-accent">UELMS AI</span>
                 </div>
               )}
+              
+              {/* Show image if attached */}
+              {message.image && (
+                <div className="mb-3">
+                  <img 
+                    src={message.image} 
+                    alt="Attached" 
+                    className="rounded-lg max-w-full max-h-48 object-cover"
+                  />
+                </div>
+              )}
+              
               <p className="text-sm whitespace-pre-line">{message.content}</p>
               
               {/* Function call badges */}
@@ -212,9 +381,62 @@ export default function AIAssistant() {
         </div>
       )}
 
+      {/* Image Preview */}
+      {selectedImage && (
+        <div className="px-4 pb-2">
+          <div className="relative inline-block">
+            <img 
+              src={selectedImage} 
+              alt="Selected" 
+              className="h-20 w-20 object-cover rounded-lg border border-gray-200"
+            />
+            <button
+              onClick={removeImage}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-gray-800 rounded-full flex items-center justify-center text-white hover:bg-gray-700"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Input */}
       <div className="p-4 border-t border-gray-200 bg-white">
         <div className="flex items-center gap-2">
+          {/* Image Upload Button */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageSelect}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+            title="Attach image"
+          >
+            <ImageIcon size={20} />
+          </button>
+
+          {/* Camera Button (for mobile) */}
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleImageSelect}
+            className="hidden"
+            id="camera-input"
+          />
+          <button
+            onClick={() => document.getElementById('camera-input')?.click()}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+            title="Take photo"
+          >
+            <Camera size={20} />
+          </button>
+
+          {/* Text Input */}
           <input
             type="text"
             value={input}
@@ -223,14 +445,37 @@ export default function AIAssistant() {
             placeholder="Ask about your equipment..."
             className="flex-1 bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-accent transition-colors"
           />
+
+          {/* Voice Input Button */}
+          <button
+            onClick={toggleRecording}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+              isRecording 
+                ? "bg-accent text-white animate-pulse" 
+                : "text-gray-500 hover:bg-gray-100"
+            }`}
+            title={isRecording ? "Stop recording" : "Voice input"}
+          >
+            {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+          </button>
+
+          {/* Send Button */}
           <button
             onClick={handleSend}
-            disabled={!input.trim() || isLoading}
+            disabled={(!input.trim() && !selectedImage) || isLoading}
             className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-700 transition-colors"
           >
             <Send size={20} />
           </button>
         </div>
+        
+        {/* Recording indicator */}
+        {isRecording && (
+          <div className="mt-2 flex items-center gap-2 text-accent text-xs">
+            <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+            Listening... Speak now
+          </div>
+        )}
       </div>
     </div>
   );

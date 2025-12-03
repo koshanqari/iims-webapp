@@ -255,24 +255,53 @@ function handleFunctionCall(name: string, args: Record<string, unknown>): string
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json();
+    const { messages, image } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Messages array required" }, { status: 400 });
     }
 
-    // Add system prompt
-    const messagesWithSystem = [
-      { role: "system" as const, content: SYSTEM_PROMPT },
-      ...messages,
+    // Build messages array with system prompt
+    const messagesWithSystem: OpenAI.Chat.ChatCompletionMessageParam[] = [
+      { role: "system", content: SYSTEM_PROMPT },
     ];
 
-    // Initial API call
+    // Add conversation history
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      
+      // If this is the last message and there's an image, add it as multimodal content
+      if (i === messages.length - 1 && image && msg.role === "user") {
+        messagesWithSystem.push({
+          role: "user",
+          content: [
+            { type: "text", text: msg.content || "Please analyze this image and identify any equipment issues or problems you can see." },
+            { 
+              type: "image_url", 
+              image_url: { 
+                url: image,
+                detail: "high"
+              } 
+            },
+          ],
+        });
+      } else {
+        messagesWithSystem.push({
+          role: msg.role,
+          content: msg.content,
+        });
+      }
+    }
+
+    // Initial API call - use gpt-4o for vision support
+    const modelToUse = image ? "gpt-4o" : "gpt-4o-mini";
+    
     let response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: modelToUse,
       messages: messagesWithSystem,
       tools: functions,
       tool_choice: "auto",
+      max_tokens: 1000,
     });
 
     let assistantMessage = response.choices[0].message;
