@@ -22,7 +22,7 @@ You have access to the following functions to take actions:
 - get_maintenance_schedule: Get upcoming maintenance schedule
 
 Current Context:
-- User: John Smith (Operator)
+- User: Rajesh Kumar (Senior Equipment Operator)
 - Assigned Equipment: 
   1. CAT 320D Excavator (ID: EX-001) - 4,850 engine hours, operational
   2. Komatsu PC200 (ID: EX-002) - 3,200 engine hours, operational
