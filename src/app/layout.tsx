@@ -5,8 +5,8 @@ export const metadata: Metadata = {
   title: "UELMS - Equipment Lifecycle Management",
   description: "Unified Equipment Lifecycle Management Platform by IIMS",
   icons: {
-    icon: "https://iba-consulting-prod.b-cdn.net/gj-logos/UELMS.png",
-    apple: "https://iba-consulting-prod.b-cdn.net/gj-logos/UELMS.png",
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 };
 
