@@ -9,8 +9,9 @@ import UsersTab from "@/components/iims_admin/UsersTab";
 import ClientsTab from "@/components/iims_admin/ClientsTab";
 import ServiceRequestsTab from "@/components/iims_admin/ServiceRequestsTab";
 import ActivitiesTab from "@/components/iims_admin/ActivitiesTab";
+import InventoryTab from "@/components/iims_admin/InventoryTab";
 
-type Tab = "dashboard" | "equipment" | "users" | "clients" | "service_requests" | "activities" | "reports" | "settings";
+type Tab = "dashboard" | "equipment" | "users" | "clients" | "service_requests" | "activities" | "inventory" | "reports" | "settings";
 
 export default function IIMSAdminPage() {
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
@@ -29,6 +30,8 @@ export default function IIMSAdminPage() {
         return <ServiceRequestsTab />;
       case "activities":
         return <ActivitiesTab />;
+      case "inventory":
+        return <InventoryTab />;
       default:
         return <DashboardTab />;
     }

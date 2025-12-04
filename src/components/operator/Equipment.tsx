@@ -26,7 +26,8 @@ import {
   Video,
   ExternalLink,
   AlertOctagon,
-  X
+  X,
+  TrendingUp
 } from "lucide-react";
 import { ServiceRequestPrefill } from "@/app/operator/page";
 
@@ -44,6 +45,9 @@ interface Equipment {
   hoursToday: number;
   fuelLevel: number;
   engineHours: number;
+  engineTemp: number;
+  hydraulicPSI: number;
+  uptime: number;
   lastService: string;
   healthScore: number;
 }
@@ -97,6 +101,9 @@ const assignedEquipment: Equipment[] = [
     hoursToday: 6.5,
     fuelLevel: 72,
     engineHours: 4850,
+    engineTemp: 87,
+    hydraulicPSI: 2450,
+    uptime: 94,
     lastService: "Nov 15, 2024",
     healthScore: 92,
   },
@@ -113,6 +120,9 @@ const assignedEquipment: Equipment[] = [
     hoursToday: 5.2,
     fuelLevel: 65,
     engineHours: 3200,
+    engineTemp: 82,
+    hydraulicPSI: 2380,
+    uptime: 88,
     lastService: "Nov 20, 2024",
     healthScore: 88,
   },
@@ -129,6 +139,9 @@ const assignedEquipment: Equipment[] = [
     hoursToday: 0,
     fuelLevel: 45,
     engineHours: 2100,
+    engineTemp: 25,
+    hydraulicPSI: 0,
+    uptime: 76,
     lastService: "Dec 1, 2024",
     healthScore: 75,
   },
@@ -391,27 +404,93 @@ export default function Equipment({ onRequestService }: EquipmentProps) {
           </div>
         </div>
 
-        {/* Live Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { label: "Fuel Level", value: selectedEquipment.fuelLevel, unit: "%", icon: Zap, color: "text-amber-600" },
-            { label: "Engine Temp", value: "87", unit: "°C", icon: ThermometerSun, color: "text-orange-600" },
-            { label: "Hydraulic PSI", value: "2,450", unit: "psi", icon: Gauge, color: "text-blue-600" },
-            { label: "Hours Today", value: selectedEquipment.hoursToday, unit: "hrs", icon: Clock, color: "text-green-600" },
-          ].map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div key={index} className="bg-white border border-gray-200 rounded-xl p-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <Icon size={14} className={stat.color} />
-                  <span className="text-xs text-gray-500">{stat.label}</span>
-                </div>
-                <p className="text-lg font-bold text-gray-900">
-                  {stat.value}<span className="text-xs font-normal text-gray-500 ml-1">{stat.unit}</span>
+        {/* Equipment Health Card */}
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+              <Activity size={16} className="text-accent" />
+              Equipment Health
+            </h3>
+            <span className="text-xs text-gray-500">Live Data</span>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-3">
+            {/* Engine Hours */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <Clock size={12} />
+                <span className="text-xs">Engine Hours</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">{selectedEquipment.engineHours.toLocaleString()}</p>
+              <p className="text-xs text-gray-500">hours</p>
+            </div>
+            
+            {/* Uptime */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <TrendingUp size={12} />
+                <span className="text-xs">Uptime</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">{selectedEquipment.uptime}%</p>
+              <p className="text-xs text-green-600">This month</p>
+            </div>
+            
+            {/* Engine Temp */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <ThermometerSun size={12} />
+                <span className="text-xs">Engine Temp</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">{selectedEquipment.engineTemp}°C</p>
+              <p className={`text-xs ${selectedEquipment.engineTemp > 95 ? 'text-red-600' : 'text-green-600'}`}>
+                {selectedEquipment.engineTemp > 95 ? 'High' : 'Normal'}
+              </p>
+            </div>
+            
+            {/* Hydraulic PSI */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <Gauge size={12} />
+                <span className="text-xs">Hydraulic PSI</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">{selectedEquipment.hydraulicPSI.toLocaleString()}</p>
+              <p className={`text-xs ${selectedEquipment.hydraulicPSI > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                {selectedEquipment.hydraulicPSI > 0 ? 'Optimal' : 'Offline'}
+              </p>
+            </div>
+            
+            {/* Fuel Level */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <Zap size={12} />
+                <span className="text-xs">Fuel Level</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">{selectedEquipment.fuelLevel}%</p>
+              <div className="mt-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full rounded-full ${selectedEquipment.fuelLevel > 30 ? 'bg-green-500' : 'bg-amber-500'}`}
+                  style={{ width: `${selectedEquipment.fuelLevel}%` }}
+                />
+              </div>
+            </div>
+            
+            {/* Status */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <Activity size={12} />
+                <span className="text-xs">Status</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-2.5 h-2.5 rounded-full ${
+                  selectedEquipment.status === "active" ? 'bg-green-500 animate-pulse' : 
+                  selectedEquipment.status === "idle" ? 'bg-amber-500' : 'bg-red-500'
+                }`} />
+                <p className="text-lg font-bold text-gray-900 capitalize">
+                  {selectedEquipment.status === "active" ? "Running" : selectedEquipment.status}
                 </p>
               </div>
-            );
-          })}
+            </div>
+          </div>
         </div>
 
         {/* Quick Actions */}

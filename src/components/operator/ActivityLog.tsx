@@ -18,7 +18,9 @@ import {
   Activity,
   Timer,
   Plus,
-  AlertOctagon
+  AlertOctagon,
+  Zap,
+  TrendingUp
 } from "lucide-react";
 import { ServiceRequestPrefill } from "@/app/operator/page";
 
@@ -539,25 +541,101 @@ export default function ActivityLog({ onReportIssue }: ActivityLogProps) {
           </p>
         </div>
 
-        {/* Live Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Fuel size={14} className="text-amber-600" />
-              <span className="text-xs text-gray-500">Fuel Level</span>
-            </div>
-            <p className="text-xl font-bold text-gray-900">
-              {Math.max(0, selectedActiveActivity.equipment.fuelLevel - Math.floor(elapsedTime / 600))}%
-            </p>
+        {/* Equipment Health Card */}
+        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+              <Activity size={16} className="text-accent" />
+              Equipment Health
+            </h3>
+            <span className="text-xs text-gray-500">Live Data</span>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Clock size={14} className="text-blue-600" />
-              <span className="text-xs text-gray-500">Engine Hours</span>
+          
+          <div className="grid grid-cols-3 gap-3">
+            {/* Engine Hours */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <Clock size={12} />
+                <span className="text-xs">Engine Hours</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">
+                {(selectedActiveActivity.startReadings.engineHours + elapsedTime / 3600).toFixed(1)}
+              </p>
+              <p className="text-xs text-gray-500">hours</p>
             </div>
-            <p className="text-xl font-bold text-gray-900">
-              {(selectedActiveActivity.startReadings.engineHours + elapsedTime / 3600).toFixed(1)}
-            </p>
+            
+            {/* Uptime */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <TrendingUp size={12} />
+                <span className="text-xs">Uptime</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">94%</p>
+              <p className="text-xs text-green-600">This month</p>
+            </div>
+            
+            {/* Engine Temp */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <ThermometerSun size={12} />
+                <span className="text-xs">Engine Temp</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">
+                {Math.min(95, selectedActiveActivity.equipment.engineTemp + Math.floor(elapsedTime / 120))}°C
+              </p>
+              <p className={`text-xs ${
+                Math.min(95, selectedActiveActivity.equipment.engineTemp + Math.floor(elapsedTime / 120)) > 90 
+                  ? 'text-amber-600' 
+                  : 'text-green-600'
+              }`}>
+                {Math.min(95, selectedActiveActivity.equipment.engineTemp + Math.floor(elapsedTime / 120)) > 90 ? 'Warming up' : 'Normal'}
+              </p>
+            </div>
+            
+            {/* Hydraulic PSI */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <Gauge size={12} />
+                <span className="text-xs">Hydraulic PSI</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">
+                {selectedActiveActivity.equipment.hydraulicPSI.toLocaleString()}
+              </p>
+              <p className="text-xs text-green-600">Optimal</p>
+            </div>
+            
+            {/* Fuel Level */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <Zap size={12} />
+                <span className="text-xs">Fuel Level</span>
+              </div>
+              <p className="text-xl font-bold text-gray-900">
+                {Math.max(0, selectedActiveActivity.equipment.fuelLevel - Math.floor(elapsedTime / 600))}%
+              </p>
+              <div className="mt-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full rounded-full ${
+                    Math.max(0, selectedActiveActivity.equipment.fuelLevel - Math.floor(elapsedTime / 600)) > 30 
+                      ? 'bg-green-500' 
+                      : 'bg-amber-500'
+                  }`}
+                  style={{ width: `${Math.max(0, selectedActiveActivity.equipment.fuelLevel - Math.floor(elapsedTime / 600))}%` }}
+                />
+              </div>
+            </div>
+            
+            {/* Status */}
+            <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div className="flex items-center gap-2 text-gray-500 mb-1">
+                <Activity size={12} />
+                <span className="text-xs">Status</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+                <p className="text-lg font-bold text-gray-900">Running</p>
+              </div>
+            </div>
           </div>
         </div>
 
