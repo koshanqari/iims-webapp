@@ -2,7 +2,7 @@
 
 import {
   Truck,
-  MessageSquare,
+  Sparkles,
   Activity,
   Wrench,
   User,
@@ -17,7 +17,7 @@ interface BottomNavProps {
 
 const navItems: { id: Tab; label: string; icon: typeof Truck }[] = [
   { id: "equipment", label: "Equipment", icon: Truck },
-  { id: "assistant", label: "AI", icon: MessageSquare },
+  { id: "assistant", label: "AI", icon: Sparkles },
   { id: "activity", label: "Activity", icon: Activity },
   { id: "service", label: "Service", icon: Wrench },
   { id: "profile", label: "Profile", icon: User },

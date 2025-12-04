@@ -26,6 +26,9 @@ import {
   ShoppingCart,
   Building,
   Calendar,
+  Pencil,
+  Trash2,
+  Upload,
 } from "lucide-react";
 
 // Types

@@ -15,7 +15,9 @@ import {
   MapPin,
   TrendingUp,
   PlayCircle,
-  AlertTriangle
+  AlertTriangle,
+  Download,
+  RefreshCw,
 } from "lucide-react";
 
 interface EquipmentActivity {
@@ -231,6 +233,16 @@ export default function ActivitiesTab() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Activities</h1>
           <p className="text-gray-500">Monitor equipment usage and operator activities</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+            <Download size={16} />
+            Export Report
+          </button>
         </div>
       </div>
 

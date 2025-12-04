@@ -15,7 +15,11 @@ import {
   Image,
   Wrench,
   ArrowUpRight,
-  X
+  X,
+  Plus,
+  Download,
+  Pencil,
+  UserCheck,
 } from "lucide-react";
 
 interface ServiceRequest {
@@ -196,6 +200,16 @@ export default function ServiceRequestsTab() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Service Requests</h1>
           <p className="text-gray-500">Manage and track all service requests from operators</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+            <Download size={16} />
+            Export
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+            <Plus size={18} />
+            New Request
+          </button>
         </div>
       </div>
 

@@ -20,6 +20,11 @@ import {
   Fuel,
   AlertCircle,
   CheckCircle,
+  Pencil,
+  Trash2,
+  Download,
+  Upload,
+  MoreVertical,
 } from "lucide-react";
 
 interface AssignedEquipment {
@@ -140,9 +145,17 @@ export default function UsersTab() {
           <h2 className="text-2xl font-bold text-gray-900">Users</h2>
           <p className="text-gray-500">{usersData.length} team members across {clients.length - 1} clients</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
-          <Plus size={18} /> Add User
-        </button>
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+            <Upload size={16} /> Import
+          </button>
+          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+            <Download size={16} /> Export
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+            <Plus size={18} /> Add User
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -192,6 +205,7 @@ export default function UsersTab() {
                 <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Equipment</th>
                 <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Contact</th>
                 <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -205,6 +219,16 @@ export default function UsersTab() {
                   <td className="py-3 px-4">{user.assignedEquipment.length > 0 ? (<div className="flex flex-wrap gap-1">{user.assignedEquipment.slice(0, 2).map((eq) => (<span key={eq.id} className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded">{eq.serialNumber}</span>))}{user.assignedEquipment.length > 2 && (<span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded">+{user.assignedEquipment.length - 2}</span>)}</div>) : (<span className="text-xs text-gray-400">-</span>)}</td>
                   <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}><div className="flex items-center gap-2"><a href={`tel:${user.phone}`} className="p-1.5 bg-gray-100 rounded hover:bg-accent-light hover:text-accent transition-colors"><Phone size={12} /></a><a href={`mailto:${user.email}`} className="p-1.5 bg-gray-100 rounded hover:bg-accent-light hover:text-accent transition-colors"><Mail size={12} /></a></div></td>
                   <td className="py-3 px-4"><span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[user.status]}`}>{statusLabels[user.status]}</span></td>
+                  <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-1">
+                      <button className="p-1.5 text-gray-400 hover:text-accent hover:bg-accent-light rounded transition-colors" title="Edit">
+                        <Pencil size={14} />
+                      </button>
+                      <button className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

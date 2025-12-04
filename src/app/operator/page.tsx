@@ -9,6 +9,7 @@ import ActivityLog from "@/components/operator/ActivityLog";
 import ServiceRequest from "@/components/operator/ServiceRequest";
 import Profile from "@/components/operator/Profile";
 import NotificationsPanel from "@/components/operator/NotificationsPanel";
+import PartnerFooter from "@/components/PartnerFooter";
 
 type Tab = "equipment" | "assistant" | "activity" | "service" | "profile";
 
@@ -68,6 +69,11 @@ export default function OperatorPage() {
       
       <main className="pb-20 overflow-y-auto">
         {renderContent()}
+        {activeTab !== "assistant" && (
+          <div className="px-4 mt-6">
+            <PartnerFooter compact />
+          </div>
+        )}
       </main>
       
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />

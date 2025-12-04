@@ -35,7 +35,12 @@ import {
   Eye,
   Settings,
   Calendar,
-  History
+  History,
+  Plus,
+  Pencil,
+  Trash2,
+  Download,
+  Upload
 } from "lucide-react";
 
 // Data structures
@@ -415,6 +420,46 @@ export default function EquipmentTab() {
               ))}
             </div>
           </div>
+        </div>
+        
+        {/* Admin Actions */}
+        <div className="flex items-center gap-2">
+          {viewLevel === "categories" && (
+            <button className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg font-medium text-sm hover:bg-red-700 transition-colors">
+              <Plus size={18} />
+              Add Category
+            </button>
+          )}
+          {viewLevel === "oems" && (
+            <button className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg font-medium text-sm hover:bg-red-700 transition-colors">
+              <Plus size={18} />
+              Add OEM
+            </button>
+          )}
+          {viewLevel === "skus" && (
+            <button className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg font-medium text-sm hover:bg-red-700 transition-colors">
+              <Plus size={18} />
+              Add Model
+            </button>
+          )}
+          {viewLevel === "machines" && (
+            <button className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg font-medium text-sm hover:bg-red-700 transition-colors">
+              <Plus size={18} />
+              Add Machine
+            </button>
+          )}
+          {viewLevel === "analytics" && (
+            <div className="flex items-center gap-2">
+              <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 transition-colors">
+                <Pencil size={16} />
+                Edit
+              </button>
+              <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 transition-colors">
+                <Download size={16} />
+                Export
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

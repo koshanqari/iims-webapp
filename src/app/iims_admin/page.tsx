@@ -10,6 +10,7 @@ import ClientsTab from "@/components/iims_admin/ClientsTab";
 import ServiceRequestsTab from "@/components/iims_admin/ServiceRequestsTab";
 import ActivitiesTab from "@/components/iims_admin/ActivitiesTab";
 import InventoryTab from "@/components/iims_admin/InventoryTab";
+import PartnerFooter from "@/components/PartnerFooter";
 
 type Tab = "dashboard" | "equipment" | "users" | "clients" | "service_requests" | "activities" | "inventory" | "reports" | "settings";
 
@@ -43,7 +44,12 @@ export default function IIMSAdminPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-auto p-6">
-          {renderContent()}
+          <div className="min-h-full flex flex-col">
+            <div className="flex-1">
+              {renderContent()}
+            </div>
+            <PartnerFooter />
+          </div>
         </main>
       </div>
     </div>
