@@ -1,19 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Header from "@/components/operator/Header";
 import BottomNav from "@/components/operator/BottomNav";
-import Dashboard from "@/components/operator/Dashboard";
+import Equipment from "@/components/operator/Equipment";
 import AIAssistant from "@/components/operator/AIAssistant";
 import ActivityLog from "@/components/operator/ActivityLog";
 import ServiceRequest from "@/components/operator/ServiceRequest";
 import Profile from "@/components/operator/Profile";
 import NotificationsPanel from "@/components/operator/NotificationsPanel";
 
-type Tab = "dashboard" | "assistant" | "activity" | "service" | "profile";
+type Tab = "equipment" | "assistant" | "activity" | "service" | "profile";
+
+export interface ServiceRequestPrefill {
+  equipmentId: string;
+  equipmentName: string;
+  serialNumber: string;
+  part?: string;
+}
 
 const tabTitles: Record<Tab, string> = {
-  dashboard: "Dashboard",
+  equipment: "My Equipment",
   assistant: "AI Assistant",
   activity: "Activity",
   service: "Service Request",
@@ -21,23 +28,33 @@ const tabTitles: Record<Tab, string> = {
 };
 
 export default function OperatorPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+  const [activeTab, setActiveTab] = useState<Tab>("equipment");
   const [showNotifications, setShowNotifications] = useState(false);
+  const [serviceRequestPrefill, setServiceRequestPrefill] = useState<ServiceRequestPrefill | null>(null);
+
+  const handleReportIssue = useCallback((prefill: ServiceRequestPrefill) => {
+    setServiceRequestPrefill(prefill);
+    setActiveTab("service");
+  }, []);
+
+  const clearServicePrefill = useCallback(() => {
+    setServiceRequestPrefill(null);
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
-      case "dashboard":
-        return <Dashboard />;
+      case "equipment":
+        return <Equipment onRequestService={handleReportIssue} />;
       case "assistant":
         return <AIAssistant />;
       case "activity":
-        return <ActivityLog />;
+        return <ActivityLog onReportIssue={handleReportIssue} />;
       case "service":
-        return <ServiceRequest />;
+        return <ServiceRequest prefill={serviceRequestPrefill} onClearPrefill={clearServicePrefill} />;
       case "profile":
         return <Profile />;
       default:
-        return <Dashboard />;
+        return <Equipment onRequestService={handleReportIssue} />;
     }
   };
 
@@ -49,7 +66,7 @@ export default function OperatorPage() {
         onNotificationClick={() => setShowNotifications(true)}
       />
       
-      <main className="pb-20">
+      <main className="pb-20 overflow-y-auto">
         {renderContent()}
       </main>
       
@@ -62,4 +79,3 @@ export default function OperatorPage() {
     </div>
   );
 }
-

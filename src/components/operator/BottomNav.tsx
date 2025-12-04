@@ -1,22 +1,22 @@
 "use client";
 
 import {
-  LayoutDashboard,
+  Truck,
   MessageSquare,
   Activity,
   Wrench,
   User,
 } from "lucide-react";
 
-type Tab = "dashboard" | "assistant" | "activity" | "service" | "profile";
+type Tab = "equipment" | "assistant" | "activity" | "service" | "profile";
 
 interface BottomNavProps {
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;
 }
 
-const navItems: { id: Tab; label: string; icon: typeof LayoutDashboard }[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+const navItems: { id: Tab; label: string; icon: typeof Truck }[] = [
+  { id: "equipment", label: "Equipment", icon: Truck },
   { id: "assistant", label: "AI", icon: MessageSquare },
   { id: "activity", label: "Activity", icon: Activity },
   { id: "service", label: "Service", icon: Wrench },
@@ -55,4 +55,3 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
     </nav>
   );
 }
-

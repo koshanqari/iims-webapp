@@ -7,10 +7,12 @@ import {
   Building2, 
   FileText, 
   Settings,
-  LogOut
+  LogOut,
+  Wrench,
+  Activity
 } from "lucide-react";
 
-type Tab = "dashboard" | "equipment" | "users" | "clients" | "reports" | "settings";
+type Tab = "dashboard" | "equipment" | "users" | "clients" | "service_requests" | "activities" | "reports" | "settings";
 
 interface SidebarProps {
   activeTab: Tab;
@@ -22,6 +24,8 @@ const menuItems: { id: Tab; label: string; icon: typeof LayoutDashboard }[] = [
   { id: "equipment", label: "Equipment", icon: Truck },
   { id: "users", label: "Users", icon: Users },
   { id: "clients", label: "Clients", icon: Building2 },
+  { id: "service_requests", label: "Service Requests", icon: Wrench },
+  { id: "activities", label: "Activities", icon: Activity },
   { id: "reports", label: "Reports", icon: FileText },
   { id: "settings", label: "Settings", icon: Settings },
 ];
