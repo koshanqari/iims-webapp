@@ -37,13 +37,14 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">U</span>
-          </div>
-          <div>
-            <h1 className="font-bold text-gray-900">UELMS</h1>
-            <p className="text-xs text-gray-500">IIMS Admin</p>
+        <div className="flex flex-col items-center gap-3">
+          <img 
+            src="https://iba-consulting-prod.b-cdn.net/gj-logos/UELMS.png" 
+            alt="UELMS Logo" 
+            className="h-16 w-full object-contain"
+          />
+          <div className="text-center">
+            <p className="text-xs text-gray-500">Unified Equipment management system</p>
           </div>
         </div>
       </div>

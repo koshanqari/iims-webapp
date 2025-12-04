@@ -73,15 +73,14 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center gap-3">
-          <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">U</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">UELMS</h1>
-            <p className="text-sm text-gray-500">Equipment Lifecycle Management</p>
-          </div>
+      <header className="bg-white border-b border-gray-200 px-6 py-5">
+        <div className="max-w-5xl mx-auto flex flex-col items-center gap-3">
+          <img 
+            src="https://iba-consulting-prod.b-cdn.net/gj-logos/UELMS.png" 
+            alt="UELMS Logo" 
+            className="h-16 md:h-20 object-contain"
+          />
+          <p className="text-sm md:text-base text-gray-500 text-center">Unified Equipment Lifecycle Management System</p>
         </div>
       </header>
 
